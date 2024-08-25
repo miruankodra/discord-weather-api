@@ -5,26 +5,27 @@ export class WeatherApiService {
         this.weatherDto = {};
     }
     async getWeather() {
-        https.get(process.env.API_URL, (res) => {
-            let data = '';
-            res.on('data', (d) => {
-                data += d;
-            });
-            res.on('end', () => {
-                try {
-                    this.weatherDto = JSON.parse(data);
-                    console.log(this.weatherDto);
-                    return this.weatherDto;
-                }
-                catch (e) {
-                    console.log(e);
-                }
-            });
-            res.on('error', (error) => {
-                console.error(error);
+        return new Promise((resolve, reject) => {
+            https.get(process.env.API_URL, (res) => {
+                let data = '';
+                res.on('data', (d) => {
+                    data += d;
+                });
+                res.on('end', () => {
+                    try {
+                        const parsedData = JSON.parse(data);
+                        // console.log(parsedData);
+                        resolve(parsedData);
+                    }
+                    catch (e) {
+                        reject(e);
+                    }
+                });
+                res.on('error', (error) => {
+                    reject(error);
+                });
             });
         });
-        return this.weatherDto;
     }
 }
 //# sourceMappingURL=weather-api.service.js.map

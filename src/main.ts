@@ -1,16 +1,15 @@
-import {Client, GatewayIntentBits} from 'discord.js';
+import { client } from "./configs/Bot.js";
+import discordBotGuard from "./guards/discord-bot.guard.js";
 import {WeatherApiService} from './services/weather-api.service.js';
 import 'dotenv/config'
+import {WeatherDto} from "./models/weather-dto.js";
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+
+discordBotGuard(client);
 
 const weatherApiService = new WeatherApiService();
 
-weatherApiService.getWeather();
+const weatherData: WeatherDto = await weatherApiService.getWeather();
 
 
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}`);
-});
 
-client.login(process.env.DISCORD_BOT_TOKEN);
