@@ -1,5 +1,9 @@
 import { Client, Events, TextChannel } from 'discord.js';
+import { AiApiService } from "../services/aiApi.service.js";
 import 'dotenv/config';
+import {AiResponse} from "../models/ai-response.js";
+
+const _openAiService = new AiApiService();
 
 export default function discordBotGuard(client: Client) {
     client.on('ready', () => {
@@ -10,7 +14,11 @@ export default function discordBotGuard(client: Client) {
 
     client.on(Events.MessageCreate, ( message ) => {
         if (message.author.bot) return;
-        message.channel.send('For the moment I\'m not able to reply to you properly, but I will be soon!');
+        const reply = _openAiService.promptChatMessage(message.content);
+        reply.then((res) => {
+            const messageObj = JSON.parse(res.toString()) as AiResponse;
+            message.channel.send(messageObj.result);
+        })
     })
 
     client.on(Events.PresenceUpdate, (oldPresence, newPresence) => {
